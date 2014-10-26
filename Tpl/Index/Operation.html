@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script src="{$baseUrl}Public/js/jquery-1.10.2.min.js"></script>
+<script src="{$baseUrl}Public/js/operation.js"></script>
+<script> 
+	$(function(){
+	});
+	
+   var base_url = '{$baseUrl}';
+	//data have slump
+</script>
+</head>
+
+<body>
+<include file="Header" />
+<div >
+    <table>
+    <tr>
+        <td>stock:</td>
+        <td>
+            <select id="stock" name="stock" >
+                <foreach name="stocks" item="vo">
+                    <option value={$vo.id}>{$vo.symbol}</option>
+                </foreach>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>amount:</td>
+        <td><input id="amount" type="inputbox" value="0"></td>
+    </tr>
+    <tr>
+        <td>price:</td>
+        <td><input id="price" type="inputbox" value="0"></td>
+    </tr>
+    <tr>
+     <td>reason:</td>
+        <td>
+            <select id="reason" name="reason" >
+                <foreach name="reasons" item="vo">
+                    <option value={$vo.id}>{$vo.desc}</option>
+                </foreach>
+            </select>
+        </td>
+    </tr>
+    <tr><td></td>
+        <td><button id="opsubmit">operate</button></td>
+    </tr>
+</div>
+</body>
+</html>

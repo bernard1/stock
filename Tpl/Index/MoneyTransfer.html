@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script src="{$baseUrl}Public/js/jquery-1.10.2.min.js"></script>
+<script src="{$baseUrl}Public/js/operation.js"></script>
+<script> 
+	$(function(){
+	});
+	
+   var base_url = '{$baseUrl}';
+	//data have slump
+</script>
+</head>
+
+<body>
+<include file="Header" />
+<div id ='body'>
+    <table>
+    <tr>
+        <td>stock:</td>
+        <td>
+            <select id="currency" name="currency" >
+                <foreach name="stocks" item="vo">
+                    <option value={$vo.id}>{$vo.symbol}</option>
+                </foreach>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>amount:</td>
+        <td><input id="amount" type="inputbox" value="0"></td>
+    </tr>
+    <tr>
+        <td>operate type:</td>
+        <td><input type="radio" name="type" value="in">In<br>
+<input type="radio" name="type" value="out">Out</td>
+    </tr>
+    <tr>
+     <td>reason:</td>
+        <td>
+            <input id="reason" type="inputbox" value="" size=100>
+        </td>
+    </tr>
+    <tr><td></td>
+        <td><button id="moneytransfer_submit">operate</button></td>
+    </tr>
+</div>
+</body>
+</html>

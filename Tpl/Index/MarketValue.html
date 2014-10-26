@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="{$baseUrl}Public/css/marketValue.css" />
+<script src="{$baseUrl}Public/js/jquery-1.10.2.min.js"></script>
+<script src="{$baseUrl}Public/js/amcharts.js"></script>
+<script src="{$baseUrl}Public/js/marketValue.js"></script>
+
+<script> 
+	$(function(){
+	});
+		
+	var base_url = '{$baseUrl}';
+	
+	//data have slump
+</script>
+</head>
+
+<body>
+<include file="Header" />
+<div class="w-layer w-layer-full">
+	<!--graph axis selected checkbox-->
+	<div id="graph_left" class="graph-left" novalidate="">
+     <ul>
+        <li>
+        	<label class=""><input type="checkbox" name="graph_cb" value="3" checked></label>
+        </li>
+        <li>
+        	<label class=""><input type="checkbox" name="graph_cb" value="2" checked></label>
+        </li>
+        <li>
+        	<label class=""><input type="checkbox" name="graph_cb" value="1" checked></label>
+        </li>
+     </ul>
+    </div>
+    <!--end graph axis selected checkbox-->
+	<!--graph layer-->
+    <div id="account-selection"></div>
+
+
+	<div id="graph_main-div" class="graph-main"></div>
+	<!--end graph layer-->
+</div>
+</body>
+</html>

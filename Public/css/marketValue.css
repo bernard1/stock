@@ -1,0 +1,46 @@
+
+/* CSS Document */
+
+/**/
+ol, ul {
+	list-style: none outside;
+}
+
+.graph-main, .graph-left {
+	position:absolute;
+	border-radius:10px;
+	background-color:#eee;
+}
+.graph-left {
+	padding: 0;
+	margin: 0;
+	bottom: 18px;
+	left: 35px;
+	height: 42px;
+	width: 380px;
+}
+.graph-left ul li {
+	position: relative;
+	left: 7%;
+	width: 20%;
+	height: 100%;
+	float: left;
+}
+
+.graph-main{
+	top: 60px;
+	right: 30px;
+	bottom: 60px;
+	left: 30px;
+}
+.w-layer.w-layer-full .w-layer-body {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	bottom: 6px;
+	left: 6px;
+	margin: auto;
+}
+
+
+

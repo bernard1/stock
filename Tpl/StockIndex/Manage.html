@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script src="{$baseUrl}Public/js/jquery-1.10.2.min.js"></script>
+<script src="{$baseUrl}Public/js/stock_index.js"></script>
+<script> 
+	$(function(){
+	});
+	
+   var base_url = '{$baseUrl}';
+	//data have slump
+</script>
+</head>
+
+<body>
+<include file="../Index/Header" />
+<div >
+<table>
+    <tr>
+        <td>
+            <select id="haveIndexs" size="20">
+                <foreach name="indexs" item="vo">
+                <option value={$vo.id} >{$vo.title}</option>
+                </foreach>
+            </select>
+        </td>
+
+        <td>
+            <button id="opdelete">Delete</button>
+        </td>
+    </tr>
+    
+        <tr>
+            <td>stock:</td>
+            <td>
+                <select id="stock" name="stock" >
+                    <foreach name="stocks" item="vo">
+                        <option value={$vo.id} <eq name="defaultStock" value='$vo.id'>selected</eq> >{$vo.symbol}</option>
+                    </foreach>
+                </select>
+            </td>
+        </tr>
+        <tr>
+         <td>type:</td>
+            <td>
+                <select id="type" name="type" >
+                    <option value="0" <eq name="defaultType" value="0">selected</eq> >Public</option>
+                    <option value="1" <eq name="defaultType" value="1">selected</eq> >Private</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>title:</td>
+            <td><input id="title" type="inputbox" size="120" value=""></td>
+        </tr>
+        <tr><td></td>
+            <td><button id="opsubmit">Submit</button></td>
+        </tr>
+
+    </table>
+</div>
+</body>
+</html>

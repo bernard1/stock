@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script src="{$baseUrl}Public/js/jquery-1.10.2.min.js"></script>
+<script src="{$baseUrl}Public/js/amcharts.js"></script>
+<script src="{$baseUrl}Public/js/amchart_public.js"></script>
+<script src="{$baseUrl}Public/js/stock_index.js"></script>
+<script> 
+	$(function(){
+	});
+	
+   var base_url = '{$baseUrl}';
+   var chartData = '{$chartData}';
+	//data have slump
+</script>
+</head>
+
+<body>
+<include file="../Index/Header" />
+<br>
+<select id="stock_showindex" name="stock" >
+    <foreach name="stocks" item="vo">
+        <option value={$vo.id} <eq name="defaultStock" value='$vo.id'>selected</eq> >{$vo.symbol}</option>
+    </foreach>
+</select>
+
+<div id="chartdiv"></div>
+
+</body>
+</html>

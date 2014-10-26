@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script src="{$baseUrl}Public/js/jquery-1.10.2.min.js"></script>
+<script src="{$baseUrl}Public/js/fill_value.js"></script>
+<script> 
+	$(function(){
+	});
+	
+   var base_url = '{$baseUrl}';
+	//data have slump
+</script>
+</head>
+
+<body>
+<include file="../Index/Header" />
+<div >
+    <table border="1">
+   
+        <foreach name="values" item="vo">
+             <tr>
+            <td>{$vo.id}</td><td>{$vo.title}</td><td>{$vo.value}</td>
+                <td><input id="value_{$vo.id}" type="checkbox" size="20" value=""></td>
+        </tr>
+        </foreach>
+    
+    </table>
+    <button id="value_delete">Delete</button>
+
+<table>
+        <tr>
+            <td>stock:</td>
+            <td>
+                <select id="stock" name="stock" >
+                    <foreach name="stocks" item="vo">
+                        <option value={$vo.id} <eq name="defaultStock" value='$vo.id'>selected</eq> >{$vo.symbol}</option>
+                    </foreach>
+                </select>
+            </td>
+        </tr>
+        <tr>
+         <td>indexs:</td>
+            <td>
+                <select id="index" name="index" >
+                    <foreach name="indexs" item="vo">
+                        <option value={$vo.id} <eq name="defaultIndex" value='$vo.id'>selected</eq> >{$vo.title}</option>
+                    </foreach>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>year-quarter:</td>
+            <td>
+                <select id="year" name="year" >
+                    <option value="2013" <eq name="defaultYear" value='2013'>selected</eq> >2013</option>
+                    <option value="2014" <eq name="defaultYear" value='2014'>selected</eq> >2014</option>
+                </select>
+                <select id="quarter" name="quarter" >
+                    <option value="1" <eq name="defaultQuarter" value='1'>selected</eq> >1</option>
+                    <option value="2" <eq name="defaultQuarter" value='2'>selected</eq> >2</option>
+                    <option value="3" <eq name="defaultQuarter" value='3'>selected</eq> >3</option>
+                    <option value="4" <eq name="defaultQuarter" value='4'>selected</eq> >4</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>value:</td>
+            <td><input id="value" type="inputbox" size="20" value=""></td>
+        </tr>
+        <tr><td></td>
+            <td><button id="opsubmit">submit</button></td>
+        </tr>
+
+    </table>
+</div>
+</body>
+</html>
