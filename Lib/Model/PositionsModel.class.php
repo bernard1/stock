@@ -9,6 +9,11 @@ class PositionsModel extends RelationModel{
         ),
     );
     
+
+    //////////////////////////////////////////////////
+    // each stock total cost and value and profile      //
+    // some time when earn money , cost maybe is <0 //
+    //////////////////////////////////////////////////
     public function getEachStockCostVaue($symbol)
     {
         //currency
@@ -27,7 +32,12 @@ class PositionsModel extends RelationModel{
         $lastClosePrice = D('StockQuoteHistory')->getLastStockQuoteWithID($stockInfo['id']);
         $stockValue = ($lastClosePrice*$rate*$position[0]['amount']);
 
-        return array('stockCost'=>round($stockCost,2),'stockValue'=>round($stockValue,2),'profit'=>round($stockValue-$stockCost,2),'profitPercent'=>round((($stockValue-$stockCost)/$allCost['initCash']*100),2));
+        return array(
+            'stockCost'=>round($stockCost ,2),
+            'stockValue'=>round($stockValue,2),
+            'profit'=>round($stockValue-$stockCost,2),
+            'profitPercent'=>round((($stockValue-$stockCost)/$allCost['initCash']*100),2)
+        );
     }
 
 

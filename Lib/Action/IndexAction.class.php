@@ -51,6 +51,54 @@ class IndexAction extends Action {
             if ($position['asset_info']['type']==AssetType_Stock){                
                 
                 $retInfo[$retCount] = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
+
+
+                //if borrow stock to sell. value is<0 , not need calculate it to total.
+                //as well as not need calculate cost.
+                if ($retInfo[$retCount]['stockValue']>0){
+                    $totalValue += $retInfo[$retCount]['stockValue'];
+                    $totalCost += $retInfo[$retCount]['stockCost'];
+                }
+                else if ($retInfo[$retCount]['stockValue']==0){  //means not hold this stock, not need list in page
+                    continue;
+                }   
+
+                $totalProfit += $retInfo[$retCount]['profit'];
+                $retCount++;
+            }
+        }
+        $retInfo[$retCount]['symbol']='total:';
+        $retInfo[$retCount]['stockCost'] = $totalCost;
+        $retInfo[$retCount]['stockValue'] = $totalValue;
+        $retInfo[$retCount]['profit'] = $totalProfit;
+        $retInfo[$retCount]['profitPercent'] = round(($totalValue-$totalCost)/$stockCost['initCash']*100,2);
+
+
+        $this->stockValues = $retInfo;
+        $this->display("Tpl/Index/StockProfitDetail.html");
+    }
+
+    public function showStockProfitChart()
+    {
+
+        $retInfo=array();
+        $retCount = 0;
+        $totalCost = 0;
+        $totalValue = 0;
+        $totalProfit = 0;
+        $totalPercent = 0;
+
+        $positionModel = D("Positions");
+        $indexChartModel = D("IndexChart");
+
+        $stockCost = $positionModel->getAllPositionCost();
+
+        $allPosition = $positionModel->relation('asset_info')->order('id asc')->select();
+        foreach ($allPosition as $position) {
+
+            if ($position['asset_info']['type']==AssetType_Stock){                
+                
+                $retInfo[$retCount] = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
                 $pieValueData[$retCount]['symbol'] = $retInfo[$retCount]['symbol'] = $position['asset_info']['symbol'];
                 $pieValueData[$retCount]['value'] =  $retInfo[$retCount]['stockValue'];
                 if ($retInfo[$retCount]['profit']>0)
@@ -63,18 +111,9 @@ class IndexAction extends Action {
                     $pieValueData[$retCount]['profit_lost'] = abs($retInfo[$retCount]['profit']);
                     $pieValueData[$retCount]['profit_win'] = 0;
                 }    
-                $totalCost += $retInfo[$retCount]['stockCost'];
-                $totalValue += $retInfo[$retCount]['stockValue'];
-                $totalProfit += $retInfo[$retCount]['profit'];
                 $retCount++;
             }
         }
-        $retInfo[$retCount]['symbol']='total:';
-        $retInfo[$retCount]['stockCost'] = $totalCost;
-        $retInfo[$retCount]['stockValue'] = $totalValue;
-        $retInfo[$retCount]['profit'] = $totalProfit;
-        $retInfo[$retCount]['profitPercent'] = round(($totalValue-$totalCost)/$stockCost['initCash']*100,2);
-
         $chartData = array();
 
         //value pie
@@ -111,12 +150,10 @@ class IndexAction extends Action {
 
         $this->assign('chartData',json_encode($chartData));
 
+        $this->display("Tpl/Index/StockProfitChart.html");
 
 
-        $this->stockValues = $retInfo;
-        $this->display("Tpl/Index/StockProfitDetail.html");
     }
-
 
 	public function ajaxGetMarketValue(){
 
