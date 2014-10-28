@@ -51,7 +51,7 @@ class IndexAction extends Action {
             if ($position['asset_info']['type']==AssetType_Stock){                
                 
                 $retInfo[$retCount] = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
-
+                $retInfo[$retCount]['symbol'] = $position['asset_info']['symbol'];
 
                 //if borrow stock to sell. value is<0 , not need calculate it to total.
                 //as well as not need calculate cost.
