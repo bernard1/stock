@@ -16,18 +16,13 @@ class IndexAction extends Action {
          die;*/
          $this->assign('baseUrl',C('TEMPALTE_BASE_URL'));
 	}
-
     public function Index()
     {
         
         $this->showMarketValue();
     }
     public function test(){
-        //D('Positions')->updateMarketValue();
-        $model1 = D("Positions");
-        $model1->updateMarketValue();
-        
-        
+        D('Positions')->updateMarketValue();
     }
 
 
@@ -36,7 +31,9 @@ class IndexAction extends Action {
         $this->display("Tpl/Index/MarketValue.html");
         
     }
-    public function showStockProfitDetail()
+
+    //longPosition,多头仓位
+    public function showLongPositionDetail()
     {
         $retInfo=array();
         $retCount = 0;
@@ -48,6 +45,8 @@ class IndexAction extends Action {
         $positionModel = D("Positions");
         $indexChartModel = D("IndexChart");
 
+        //shortPosition, 空头仓位
+        //longPosition,多头仓位
         $stockCost = $positionModel->getAllPositionCost();
 
         $allPosition = $positionModel->relation('asset_info')->order('id asc')->select();
@@ -60,13 +59,13 @@ class IndexAction extends Action {
 
                 //if borrow stock to sell. value is<0 , not need calculate it to total.
                 //as well as not need calculate cost.
-                if ($retInfo[$retCount]['stockValue']>0){
+                if ($retInfo[$retCount]['stockValue']>=0){  //longPosition
                     $totalValue += $retInfo[$retCount]['stockValue'];
                     $totalCost += $retInfo[$retCount]['stockCost'];
                 }
-                else if ($retInfo[$retCount]['stockValue']==0){  //means not hold this stock, not need list in page
+                else{ 
                     continue;
-                }   
+                }
 
                 $totalProfit += $retInfo[$retCount]['profit'];
                 $retCount++;
@@ -80,8 +79,60 @@ class IndexAction extends Action {
 
 
         $this->stockValues = $retInfo;
-        $this->display("Tpl/Index/StockProfitDetail.html");
+        $this->display("Tpl/Index/longPositionDetail.html");
     }
+
+    //shortPosition,空头仓位
+    public function showShortPositionDetail()
+    {
+        $retInfo=array();
+        $retCount = 0;
+        $totalCost = 0;
+        $totalValue = 0;
+        $totalProfit = 0;
+        $totalPercent = 0;
+
+        $positionModel = D("Positions");
+        $indexChartModel = D("IndexChart");
+
+        //shortPosition, 空头仓位
+        //longPosition,多头仓位
+        $stockCost = $positionModel->getAllPositionCost();
+
+        $allPosition = $positionModel->relation('asset_info')->order('id asc')->select();
+        foreach ($allPosition as $position) {
+
+            if ($position['asset_info']['type']==AssetType_Stock){                
+                
+                $retInfo[$retCount] = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
+                $retInfo[$retCount]['symbol'] = $position['asset_info']['symbol'];
+
+                //if borrow stock to sell. value is<0 , not need calculate it to total.
+                //as well as not need calculate cost.
+                if ($retInfo[$retCount]['stockValue']<0){  //longPosition
+                    $totalValue += $retInfo[$retCount]['stockValue'];
+                    $totalCost += $retInfo[$retCount]['stockCost'];
+                }
+                else
+                {
+                    continue;
+                }
+
+                $totalProfit += $retInfo[$retCount]['profit'];
+                $retCount++;
+            }
+        }
+        $retInfo[$retCount]['symbol']='total:';
+        $retInfo[$retCount]['stockCost'] = $totalCost;
+        $retInfo[$retCount]['stockValue'] = $totalValue;
+        $retInfo[$retCount]['profit'] = $totalProfit;
+        $retInfo[$retCount]['profitPercent'] = round(($totalValue-$totalCost)/$stockCost['initCash']*100,2);
+
+
+        $this->stockValues = $retInfo;
+        $this->display("Tpl/Index/shortPositionDetail.html");
+    }
+
 
     public function showStockProfitChart()
     {
