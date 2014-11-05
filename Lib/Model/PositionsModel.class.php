@@ -24,12 +24,23 @@ class PositionsModel extends RelationModel{
         $rate = $currency[ $stockInfo['currency'] ];
         
         $allCost = D('positions')->getAllPositionCost();
-
+        $modelQuoteHstory = D("StockQuoteHistory");
         //position
         $position = $this->relation('asset_info')->where('stock_id='.$stockInfo['id'])->select();
 
         $stockCost += ($rate*$position[0]['total_cost']);
         $lastClosePrice = D('StockQuoteHistory')->getLastStockQuoteWithID($stockInfo['id']);
+        if ($lastClosePrice ==0){
+            if ($stockInfo['market']=='ShangHaiA' || $stockInfo['market']=='ShenZhenA')
+            {
+                $symbol = explode(".", $stockInfo['symbol']);
+                if ($stockInfo['market']=='ShangHaiA')
+                    $sybl = 'sh'.$symbol[0];
+                else
+                    $sybl = 'sz'.$symbol[0];
+                $lastClosePrice = $modelQuoteHstory->getLastQuoteFromSina($sybl);
+            }
+        }
         $stockValue = ($lastClosePrice*$rate*$position[0]['amount']);
 
         return array(

@@ -58,6 +58,9 @@ class StockQuoteHistoryModel extends RelationModel{
 		$quote = $this->order('date desc')->where('stock_id='.$stock_id)->limit(1)->select();
 		if (!empty($quote[0]))
 			return $quote[0]['close'];
+		else{
+			
+		}
 
 		return 0;
 	}
