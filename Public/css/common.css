@@ -1,0 +1,23 @@
+tr:nth-child(odd) td>div {
+	background-color: #47ABDF;
+	background-color: rgba(71,171,223,.36);
+}
+td>div {
+	margin: 10px auto auto;
+	font-size: 18px;
+}
+.ellipsis, .table-ellipsis th>div, .table-ellipsis td>div {
+	display: block;
+	overflow: hidden;
+	white-space: nowrap;
+	word-break: break-all;
+	-webkit-text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+}
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td {
+	padding: 0;
+	margin: 0;
+}
+
+
