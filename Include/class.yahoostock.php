@@ -206,7 +206,8 @@ class YahooStock {
         $end = explode('-',get_date($endDate));
 
 
-        $url = "http://ichart.finance.yahoo.com/table.csv?s=$stockSymbol&a=".($start[1]-1)."&b=".$start[2].'&c='.$start[0]."&d=".($end[1]-1)."&e=".$end[2]."&f=".$end[0]."&g=$priceType";
+        $url = "http://table.finance.yahoo.com/table.csv?s=$stockSymbol&a=".($start[1]-1)."&b=".$start[2].'&c='.$start[0]."&d=".($end[1]-1)."&e=".$end[2]."&f=".$end[0]."&g=$priceType";
+        //http://table.finance.yahoo.com/table.csv?s=ibm&d=6&e=22&f=2006&g=d&a=11&b=16&c=1991&ignore=.csv
         $s = file_get_contents($url);
         if (empty($s))    return '';
 

@@ -1,6 +1,9 @@
 <?php
 class StockQuoteHistoryModel extends RelationModel{
-	protected $tableName = 'stock_quote_history';
+	//protected $_name = 'stock_quote_history';
+
+
+
 
 	//check newest price history and save to database.
 	public function updateStockQuote($stock_id)
@@ -79,5 +82,26 @@ class StockQuoteHistoryModel extends RelationModel{
 		else
 			return $quote[0]['close'];
 
+	}
+
+	public function getLastQuoteFromSina($symbol)
+	{
+		$url = "http://hq.sinajs.cn/list=".$symbol;
+		$s = file_get_contents($url);
+        if (empty($s))    return '';
+        /**
+         * convert the comma separated data into array
+         * populate result array with stock code as key
+         */
+        
+        $fields = split(',', $s);
+        
+        //0：”大秦铁路”，股票名字；
+		//1：”27.55″，今日开盘价；
+		//2：”27.25″，昨日收盘价；
+		//3：”26.91″，当前价格；
+		//4：”27.55″，今日最高价；
+		//5：”26.20″，今日最低价；
+        return $fields[3];
 	}
 }

@@ -62,10 +62,12 @@ class PositionsModel extends RelationModel{
             $beginDate = DateAdd('d',1,$lastValueDate[0]['date']);
         }
         $beginDate = get_date($beginDate);
-
         //each date stock value
         $stockValue = array();
+        $modelQuoteHstory = D("StockQuoteHistory");
+
         while( DateDiff('d',$beginDate,now()) >=1 ){
+
             $cashValue = 0;
             $stockCost = 0;
             $stockVal = 0;
@@ -80,11 +82,27 @@ class PositionsModel extends RelationModel{
                     //$quoteHistory   
                     $dateTime = explode(' ',$beginDate);
                     $closePrice = $SQHModal->getQuoteByDate($postion['asset_info']['id'],$dateTime[0]);
+
+
+                    //can't find this date close quote price.
+                    //use sina get today's price
                     if ($closePrice==0){
-                        $havePrice0 = true;
-                        break;
+                        if ($postion['asset_info']['market']=='ShangHaiA' || $postion['asset_info']['market']=='ShenZhenA')
+                        {
+                            $symbol = explode(".", $postion['asset_info']['symbol']);
+                            if ($postion['asset_info']['market']=='ShangHaiA')
+                                $sybl = 'sh'.$symbol[0];
+                            else
+                                $sybl = 'sz'.$symbol[0];
+                            $closePrice = $modelQuoteHstory->getLastQuoteFromSina($sybl);
+                        }
+                        if ($closePrice==0){
+                            $havePrice0 = true;
+                            break;
+                        }
                     }
-                    $stockVal += ($closePrice*$rate*$postion['amount']);
+                    if ($postion['amount']>0)
+                        $stockVal += ($closePrice*$rate*$postion['amount']);
                     
 
                     //$stockCost += ($rate*$postion['amount']*$postion['total_cost']);
@@ -96,7 +114,6 @@ class PositionsModel extends RelationModel{
             }
             $beginDate = DateAdd('d',1,$beginDate);
         } //end each date
-
         $costCash = $this->getAllPositionCost();
 
         //save marketValue
@@ -131,7 +148,8 @@ class PositionsModel extends RelationModel{
             $rate = $currency[ $postion['asset_info']['currency'] ];
             $value = ($rate*$postion['total_cost']);
             if ($postion['asset_info']['type'] == AssetType_Stock){
-                $stockCost += $value;
+                 if ($postion['amount']>0)
+                    $stockCost += $value;
             }
             else if ($postion['asset_info']['type'] == AssetType_Currency){
                 $cashValue += $value;

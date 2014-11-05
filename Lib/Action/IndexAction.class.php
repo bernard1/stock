@@ -16,13 +16,18 @@ class IndexAction extends Action {
          die;*/
          $this->assign('baseUrl',C('TEMPALTE_BASE_URL'));
 	}
+
     public function Index()
     {
         
         $this->showMarketValue();
     }
     public function test(){
-        D('Positions')->updateMarketValue();
+        //D('Positions')->updateMarketValue();
+        $model1 = D("Positions");
+        $model1->updateMarketValue();
+        
+        
     }
 
 
