@@ -11,7 +11,7 @@ $(document).ready(function(){
 	$.each(chartData, function (i, value) {
 		var divName = 'chartDiv'+i;
 		$("#chartParent").append(value.html_name+"<div id='"+divName+"'></div>");
-		$('#'+divName).css('height','500px');
+		$('#'+divName).css('height','300px');
 		$('#'+divName).css('width','70%');
 		$('#'+divName).css('font-size','11px');
 		if (value.chart_type==0)
@@ -34,6 +34,22 @@ function pieChart(div,data,titleField,valueField)
     chart.outlineColor = "#FFFFFF";
     chart.outlineAlpha = 0.8;
     chart.outlineThickness = 2;
+	
+	var legend = new AmCharts.AmLegend();
+	legend.position = "left";
+	legend.textClickEnabled=true;
+	legend.verticalGap=0;
+	legend.valueWidth=100;
+	legend.markerType="circle"
+	legend.horizontalGap=100;
+	chart.addLegend(legend);
+	/*chart."legend": {
+        "markerType": "circle",
+        "position": "right",
+		"marginRight": 80,		
+		"autoMargins": false
+    },*/
+
     // WRITE
     chart.write(div);
 }

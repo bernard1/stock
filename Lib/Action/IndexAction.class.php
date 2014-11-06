@@ -174,17 +174,22 @@ class IndexAction extends Action {
 
         //value pie
         $indexChartModel->newChart(
-            "valueConsist",ChartType_pie,$pieValueData,'symbol','value',$chartData
+            "longValueConsist",ChartType_pie,$pieValueData,'symbol','value',$chartData
         );
+
+        $indexChartModel->newChart(
+            "shortValueConsist",ChartType_pie,$pieValueData,'symbol','value',$chartData,"lessthan",0
+        );
+
 
         //profit_win consist pie
         $indexChartModel->newChart(
-            "profitWinConsist",ChartType_pie,$pieValueData,'symbol','profit_win',$chartData
+            "profitWinConsist",ChartType_pie,$pieValueData,'symbol','profit_win',$chartData,"morethan",5000
         );
 
         //profit_lost consist pie
         $indexChartModel->newChart(
-            "profitLostConsist",ChartType_pie,$pieValueData,'symbol','profit_lost',$chartData
+            "profitLostConsist",ChartType_pie,$pieValueData,'symbol','profit_lost',$chartData,"morethan",0
         );
 
         //different market pie

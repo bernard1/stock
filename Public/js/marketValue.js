@@ -134,19 +134,21 @@ function draw_graph()
         var color3 = "#D2232A";
         var color4 = "#007FFF";
         var color5 = "#8f8f8f";
-        var axis1 = new_axis("total_value",color1,60+0*90,2200,1700);
+        var axis1 = new_axis("total_value",color1,60+0*90,2300,1700);
         axiss.push(axis1);
         
         var axis2 = new_axis("stockPercent",color2,60+1*90,100,20);
         axiss.push(axis2);
-        add_horizontal_guide_line(axis2,color2,80);
         add_horizontal_guide_line(axis2,color2,60);
+        add_horizontal_guide_line(axis2,color2,40);
+        add_horizontal_guide_line(axis2,color2,30);
 
         var axis3 = new_axis("profitPercent",color3,60+2*90,30,-10);
         axiss.push(axis3);
-        add_horizontal_guide_line(axis3,color3,0);
         add_horizontal_guide_line(axis3,color3,5);
         add_horizontal_guide_line(axis3,color3,10);
+        add_horizontal_guide_line(axis3,color3,15);
+        add_horizontal_guide_line(axis3,color3,20);
 
                 // GRAPH lines
         var graph1 =  new_graph(axis1,color1,"total_value",
