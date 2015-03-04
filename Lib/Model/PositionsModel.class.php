@@ -55,7 +55,6 @@ class PositionsModel extends RelationModel{
     //
     public function updateMarketValue()
     {
-
         //currency
         $currency = D('Currency')->getRateArray();
         
@@ -78,7 +77,7 @@ class PositionsModel extends RelationModel{
         $modelQuoteHstory = D("StockQuoteHistory");
 
         while( DateDiff('d',$beginDate,now()) >=1 ){
-
+            echo "here";
             $cashValue = 0;
             $stockCost = 0;
             $stockVal = 0;
@@ -93,7 +92,7 @@ class PositionsModel extends RelationModel{
                     //$quoteHistory   
                     $dateTime = explode(' ',$beginDate);
                     $closePrice = $SQHModal->getQuoteByDate($postion['asset_info']['id'],$dateTime[0]);
-
+                    echo $postion['asset_info']['symbol'].":".$closePrice."<br>";
 
                     //can't find this date close quote price.
                     //use sina get today's price
@@ -106,6 +105,7 @@ class PositionsModel extends RelationModel{
                             else
                                 $sybl = 'sz'.$symbol[0];
                             $closePrice = $modelQuoteHstory->getLastQuoteFromSina($sybl);
+                            echo "use sina.".$sybl.$closePrice."\r\n";
                         }
                         if ($closePrice==0){
                             $havePrice0 = true;
@@ -119,7 +119,6 @@ class PositionsModel extends RelationModel{
                     //$stockCost += ($rate*$postion['amount']*$postion['total_cost']);
                 }
             }//each position
-            
             if ($havePrice0 == false){
                 $stockValue[$beginDate] = $stockVal;
             }

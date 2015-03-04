@@ -21,5 +21,11 @@
 
     define("ChartType_serial",0);
     define("ChartType_pie",1);
+
+
+    define("HALF_YEAR_ANALYSIS",1);
+    define("QUARTER_YEAR_ANALYSIS", 2);
+
+
 ?>
 

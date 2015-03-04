@@ -22,7 +22,7 @@
         <td>
             <select id="stock" name="stock" >
                 <foreach name="stocks" item="vo">
-                    <option value={$vo.id}>{$vo.symbol}</option>
+                    <option value={$vo.id}>{$vo.symbol}{$vo.name}</option>
                 </foreach>
             </select>
         </td>

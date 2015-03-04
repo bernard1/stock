@@ -22,7 +22,8 @@ class IndexAction extends Action {
         $this->showMarketValue();
     }
     public function test(){
-        D('Positions')->updateMarketValue();
+        //D('Positions')->updateMarketValue();
+        D('Analysis')->opAnalysis();
     }
 
 
@@ -35,8 +36,10 @@ class IndexAction extends Action {
     //longPosition,多头仓位
     public function showLongPositionDetail()
     {
-        $retInfo=array();
+        $holdInfo=array();
         $retCount = 0;
+        $holdCount = 0;
+        $soldCount = 0;
         $totalCost = 0;
         $totalValue = 0;
         $totalProfit = 0;
@@ -54,31 +57,49 @@ class IndexAction extends Action {
 
             if ($position['asset_info']['type']==AssetType_Stock){                
                 
-                $retInfo[$retCount] = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
-                $retInfo[$retCount]['symbol'] = $position['asset_info']['symbol'];
+                $holdInfo[$holdCount] = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
+                $holdInfo[$holdCount]['symbol'] = $position['asset_info']['symbol'];
+                $holdInfo[$holdCount]['name'] = $position['asset_info']['name'];
 
                 //if borrow stock to sell. value is<0 , not need calculate it to total.
                 //as well as not need calculate cost.
-                if ($retInfo[$retCount]['stockValue']>=0){  //longPosition
-                    $totalValue += $retInfo[$retCount]['stockValue'];
-                    $totalCost += $retInfo[$retCount]['stockCost'];
+                if ($holdInfo[$holdCount]['stockValue']>0){  //longPosition
+                    $totalValue += $holdInfo[$holdCount]['stockValue'];
+                    $totalCost += $holdInfo[$holdCount]['stockCost'];
+                    $totalProfit += $holdInfo[$holdCount]['profit'];
+
+                }
+                else if($holdInfo[$holdCount]['stockValue']==0){ //already sell , but need sum profile
+                    $soldInfo[$soldCount++] = $holdInfo[$holdCount];
+                    $totalProfit += $holdInfo[$holdCount]['profit'];
+                    $totalCost += $holdInfo[$holdCount]['stockCost'];
+                    $soldProfit += $holdInfo[$holdCount]['profit'];
+                    $soldCost += $holdInfo[$holdCount]['stockCost'];
+                    unset($holdInfo[$holdCount]);
                 }
                 else{ 
                     continue;
                 }
 
-                $totalProfit += $retInfo[$retCount]['profit'];
-                $retCount++;
+                $holdCount++;
             }
         }
-        $retInfo[$retCount]['symbol']='total:';
-        $retInfo[$retCount]['stockCost'] = $totalCost;
-        $retInfo[$retCount]['stockValue'] = $totalValue;
-        $retInfo[$retCount]['profit'] = $totalProfit;
-        $retInfo[$retCount]['profitPercent'] = round(($totalValue-$totalCost)/$stockCost['initCash']*100,2);
+        $holdInfo[$holdCount]['symbol']='total:';
+        $holdInfo[$holdCount]['stockCost'] = $totalCost;
+        $holdInfo[$holdCount]['stockValue'] = $totalValue;
+        $holdInfo[$holdCount]['profit'] = $totalProfit;
+        $holdInfo[$holdCount]['profitPercent'] = round(($totalValue-$totalCost)/$stockCost['initCash']*100,2);
 
 
-        $this->stockValues = $retInfo;
+        $soldInfo[$soldCount]['symbol']='total:';
+        $soldInfo[$soldCount]['stockCost'] = $soldCost;
+        $soldInfo[$soldCount]['stockValue'] = 0;
+        $soldInfo[$soldCount]['profit'] = $soldProfit;
+        $soldInfo[$soldCount]['profitPercent'] = round((0-$soldCost)/$stockCost['initCash']*100,2);
+
+
+        $this->soldValues = $soldInfo;
+        $this->holdValues = $holdInfo;
         $this->display("Tpl/Index/longPositionDetail.html");
     }
 
@@ -106,7 +127,7 @@ class IndexAction extends Action {
                 
                 $retInfo[$retCount] = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
                 $retInfo[$retCount]['symbol'] = $position['asset_info']['symbol'];
-
+                $retInfo[$retCount]['name'] = $position['asset_info']['name'];
                 //if borrow stock to sell. value is<0 , not need calculate it to total.
                 //as well as not need calculate cost.
                 if ($retInfo[$retCount]['stockValue']<0){  //longPosition
