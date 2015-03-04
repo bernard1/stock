@@ -59,6 +59,7 @@ class StockIndexAction extends Action {
     }
     public function deleteIndex()
     {
+
         $condi =  'stock_id='.$_POST['stock_id'].' AND id='.$_POST['index_id'].' AND type='.$_POST['type'];
         
         D('stock_index_info')->where($condi)->delete();
@@ -72,7 +73,7 @@ class StockIndexAction extends Action {
         $condi =  'id='.$_POST['id'];
         $indexValue = D('index_quarter_value')->where($condi)->select();
         D('index_quarter_value')->where($condi)->delete();
-        $url = C("TEMPALTE_BASE_URL")."StockIndex/showFillIndexValue/defaultYear/".$indexValue[0]['year']."/defaultQuarter/".$indexValue[0]['quarter']."/defaultStock/".$indexValue[0]['stock'];
+        $url = C("TEMPALTE_BASE_URL")."StockIndex/showFillIndexValue/defaultYear/".$indexValue[0]['year']."/defaultQuarter/".$indexValue[0]['quarter']."/defaultStock/".$indexValue[0]['stock_id'];
         $this->ajaxReturn($url,'Success',1);    
     }
 	
@@ -168,7 +169,7 @@ class StockIndexAction extends Action {
                         $chart['chart_type'],
                         $data,
                         'quarter',
-                        'value',
+                        array('value'),
                         $chartData
                 );
             }
@@ -204,9 +205,40 @@ class StockIndexAction extends Action {
                 //last pie
                 $indexChartModel->newChart(
                     $chart['html_name'].$quarter,$chart['chart_type'],
-                    $data,'title','value',$chartData
+                    $data,'title',array('value'),$chartData
                 );
             } //end quarter pie.
+        
+
+            if ($chart['chart_type']==ChartType_serialAndColumn){
+                $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id in('.$chart['chart_parameter'].')')->order('year,quarter,index_id')->select();
+            }
+
+            if ($chart['chart_type']==ChartType_multiSerial){
+                $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id in('.$chart['chart_parameter'].')')->order('year,quarter,index_id')->select();
+                $data = array();
+                $cnValue = 0;
+                $first = false;
+                $qarter = '';
+                foreach($indexValues as $value){
+                    if (empty($quarter)){
+                        $quarter = $value['year'].'0'.$value['quarter'];
+                    }
+                    if ($quarter!=$value['year'].'0'.$value['quarter'] ){
+                        $quarter = $value['year'].'0'.$value['quarter'];
+                            $cnValue++;
+                    }
+                    $data[$cnValue]['quarter'] = $quarter;
+                    $data[$cnValue][$value['index_id']] = $value['value'];
+                    
+                }
+
+                $valueFields = explode(',', $chart['chart_parameter']);
+                $indexChartModel->newChart(
+                    $chart['html_name'].$quarter,$chart['chart_type'],
+                    $data,'quarter',$valueFields,$chartData
+                );
+            }
 
         }
         $chartStocks = $indexChartModel->getHaveChartStocks();

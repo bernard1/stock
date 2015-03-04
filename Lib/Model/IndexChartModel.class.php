@@ -30,19 +30,19 @@ class IndexChartModel extends RelationModel{
       return $haveChartStocks;
   }
 
-  public function newChart($html_name,$chartType,$data,$categoryField,$valueField,&$array,$filterType="morethan",$filterValue=0){
+  public function newChart($html_name,$chartType,$data,$categoryField,$valueFields,&$array,$filterType="morethan",$filterValue=0){
 
     if ($chartType == ChartType_pie) //ignore zero data when pie
     {
       $newData = array();
       foreach ($data as $value) {
         if ($filterType=="morethan"){
-          if ($value[$valueField] > $filterValue)
+          if ($value[$valueField[0]] > $filterValue)
             array_push($newData,$value);
         }
         if ($filterType=="lessthan"){
-          if ($value[$valueField] < $filterValue){
-            $value[$valueField] = abs($value[$valueField]);
+          if ($value[$valueField[0]] < $filterValue){
+            $value[$valueField[0]] = abs($value[$valueField[0]]);
             array_push($newData,$value);
           }
         }
@@ -57,7 +57,7 @@ class IndexChartModel extends RelationModel{
       'chart_type'=>$chartType,
       'data'=>$newData,
       'categoryField'=>$categoryField,
-      'valueField'=>$valueField,
+      'valueFields'=>$valueFields,
     );
     array_push($array,$chart);
   }

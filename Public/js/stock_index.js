@@ -52,12 +52,6 @@ $(document).ready(function(){
 		window.location = url;
 	});
 		
-	$('#opdelete').on('click', function(e){
-		if ($('#haveIndexs')[0].value =='')
-			alert("please select index.");
-
-		opdelete();
-	});
 });
 
 function opsubmit()
@@ -87,32 +81,7 @@ function opsubmit()
 	}); // end request
 }
 
-function opdelete()
-{
-	var para = 'stock_id='+$('#stock')[0].value+'&type='+$('#type')[0].value+'&index_id='+$('#haveIndexs')[0].value;
-    console.log(para);
-	$.ajax({
-        type: 'post',
-        url: base_url+'/StockIndex/deleteIndex',
-        data: para,
-        dataType: 'json',
-    	success: function(data){
-	    	if (data.status == 1)
-	    	{
 
-				window.location = data.data;
-				//window.location = base_url+'Index/showOperation';
-			}
-			else
-			{
-				alert("fail");
-			}
-    	},
-    	error: function(data){
-			alert("Read user data error.");	
-    	},
-	}); // end request
-}
 
 
 

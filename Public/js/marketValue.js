@@ -307,7 +307,8 @@ function new_graph(axis,lineColor,valueField,ballonText,ballonColor)
     newGraph.bullet = "smoothedLine";
     newGraph.bulletBorderColor = "#FFFFFF";
     newGraph.bulletBorderThickness = 2;
-    newGraph.lineThickness = 5;
+    newGraph.lineThickness = 3;
+
     if (ballonText!="")
         newGraph.balloonText = ballonText;
     else
@@ -330,7 +331,7 @@ function new_axis(title,color,offset,max,min)
     newAxis.position = "left"; // this line makes the axis to appear on the right
     newAxis.offset = offset; // this line makes the axis to appear detached from plot area
     newAxis.axisColor = color;
-    newAxis.axisThickness = 5;
+    newAxis.axisThickness = 3;
     newAxis.gridAlpha = 0;
     newAxis.title = title;
     newAxis.maximum  =max;

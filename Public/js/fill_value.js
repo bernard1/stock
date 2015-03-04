@@ -69,7 +69,6 @@ function deleteIndexValue(deleId)
     	success: function(data){
 	    	if (data.status == 1)
 	    	{
-
 				window.location = data.data;
 				//window.location = base_url+'Index/showOperation';
 			}
