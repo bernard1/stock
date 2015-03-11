@@ -137,6 +137,11 @@ class StockIndexAction extends Action {
     }
     public function showIndex($stockid = 10)
     {
+/*        $str = 'return 2'.' '.'*'.' '.'301;';
+        $a =  eval($str);
+        MYDUMP("===");
+        MYDUMP($str.$a);
+        die;*/
         $indexQuarterModel = D('index_quarter_value');
         $indexChartModel = D('IndexChart');
         $indexModel = D('Index');
@@ -153,94 +158,145 @@ class StockIndexAction extends Action {
 
             // all quarter
             if ($chart['chart_type']==ChartType_serial){
-                $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id='.$chart['chart_parameter'])->order('year,quarter,index_id')->select();
-                if (empty($indexValues[0])) continue;
-            
-                $cnValue = 0;
-                $data = array();
-                foreach($indexValues as $value){ 
-                    $data[$cnValue]['quarter'] = $value['year'].'0'.$value['quarter'];
-                    $data[$cnValue]['value'] = $value['value'];
-                    $cnValue++;
-                }
-                
-                $indexChartModel->newChart(
+                if  (strpos($chart['chart_param'],'|') )
+                {
+
+                    $graphsInfo = $this->parseChartParaDetail($chart['chart_type'],$chart['chart_param']);
+                    //all field will query from database
+                    //all data before calculate
+                    
+                    $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id in('.implode(',', $graphsInfo[0]['calcFieldList']).')')->order('year,quarter,index_id')->select();
+
+                    //compact data to 
+                    //quarter  v1 v2 v3 v4
+                    //xxxx-01  22 33 44 55
+                    $quarterData = $this->convertIndexDataToQuarterData($indexValues);
+                    //formula calculate & replace
+                    $data=array();
+                    foreach ($quarterData as $qd) {  //each quarter
+                        $cd =array();
+                        foreach ($graphsInfo as $g){ // each graph
+                            $f = $g['formulaStr'];        
+                            foreach ($qd as $key => $value) { //each field
+                                if (strtolower(substr($key,0,7))!='quarter')
+                                    $f =str_replace('id'.$key, $value, $f);
+                            }
+                            $cd[$g['valueField']] = round(eval($f),2);
+                        }
+                        $cd['quarter'] = $qd['quarter'];
+                        array_push($data, $cd);
+                    }
+
+                    $indexChartModel->newChart(
                         $chart['html_name'],
                         $chart['chart_type'],
-                        $data,
-                        'quarter',
-                        array('value'),
+                        $data,'quarter',
+                        array($graphsInfo[0]['valueField']),
                         $chartData
-                );
+                    );
+                }
+                else
+                {
+                    $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id='.$chart['chart_param'])->order('year,quarter,index_id')->select();
+                    if (empty($indexValues[0])) continue;
+            
+                    $cnValue = 0;
+                    $data = array();
+                    foreach($indexValues as $value){ 
+                       $data[$cnValue]['quarter'] = $value['year'].'0'.$value['quarter'];
+                       $data[$cnValue]['value'] = $value['value'];
+                       $cnValue++;
+                    }
+                
+                    $indexChartModel->newChart(
+                            $chart['html_name'],
+                            $chart['chart_type'],
+                            $data,
+                            'quarter',
+                            array('value'),
+                            $chartData
+                    );
+                }
             }
 
             //all quarter pie
             if ($chart['chart_type']==ChartType_pie){
-                $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id in('.$chart['chart_parameter'].')')->order('year,quarter,index_id')->select();
+                $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id in('.$chart['chart_param'].')')->order('year,quarter,index_id')->select();
                 $cnValue = 0;
                 $data = array();
                 $quarter ='';
-                foreach($indexValues as $value){
 
-                    if (empty($quarter)){
-                        $quarter = $value['year'].'0'.$value['quarter'];
-                    }
-                    if ($quarter!=$value['year'].'0'.$value['quarter'] ){  //another pie
-                       $indexChartModel->newChart(
-                            $chart['html_name'].$quarter,$chart['chart_type'],
-                            $data,'title','value',$chartData
-                        );
-                        unset($data);
-                        $cnValue =0 ;
-                        $data = array();
-                        $quarter ='';
-                    }
+                $quarterData = $this->convertIndexDataToQuarterData($indexValues);
+                foreach ($quarterData as $qd) {
+                    $data=array();
+                    $cnValue=0;
+                    foreach ($qd as $key => $value) { 
+                        if (strtolower(substr($key,0,7))!='quarter'){ 
+                            $data[$cnValue]['title'] = $indexModel->getTitleById($key);
+                            $data[$cnValue]['value'] = $value;
+                        }
+                        else
+                            $quarter = $value;
 
-                    $data[$cnValue]['title'] = $indexModel->getTitleById($value['index_id']);
-                    $data[$cnValue]['value'] = $value['value'];
-                    $cnValue++;
-    
+                        $cnValue++;
+                    }
+                    $indexChartModel->newChart(
+                        $chart['html_name'].$quarter,
+                        $chart['chart_type'],
+                        $data,
+                        'title',
+                        array('value'),
+                        $chartData
+                    );
                 }
-
-                //last pie
-                $indexChartModel->newChart(
-                    $chart['html_name'].$quarter,$chart['chart_type'],
-                    $data,'title',array('value'),$chartData
-                );
             } //end quarter pie.
-        
 
-            if ($chart['chart_type']==ChartType_serialAndColumn){
-                $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id in('.$chart['chart_parameter'].')')->order('year,quarter,index_id')->select();
-            }
 
-            if ($chart['chart_type']==ChartType_multiSerial){
-                $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id in('.$chart['chart_parameter'].')')->order('year,quarter,index_id')->select();
-                $data = array();
-                $cnValue = 0;
-                $first = false;
-                $qarter = '';
-                foreach($indexValues as $value){
-                    if (empty($quarter)){
-                        $quarter = $value['year'].'0'.$value['quarter'];
-                    }
-                    if ($quarter!=$value['year'].'0'.$value['quarter'] ){
-                        $quarter = $value['year'].'0'.$value['quarter'];
-                            $cnValue++;
-                    }
-                    $data[$cnValue]['quarter'] = $quarter;
-                    $data[$cnValue][$value['index_id']] = $value['value'];
-                    
+
+            //
+            if ($chart['chart_type']==ChartType_mutilMixedLineColumn  ){
+                $graphsInfo = $this->parseChartParaDetail($chart['chart_type'],$chart['chart_param']);
+                //all field will query from database
+                $sqlFields = '';
+                foreach ($graphsInfo as $g) {
+                    if (empty($sqlFields))
+                        $sqlFields = implode(',', $g['calcFieldList']);
+                    $sqlFields = $sqlFields.','.implode(',', $g['calcFieldList']); 
+                   // unset($g['calcFieldList']);
                 }
 
-                $valueFields = explode(',', $chart['chart_parameter']);
+                //all data before calculate
+                $indexValues = $indexQuarterModel->where('stock_id='.$stockid.' and index_id in('.$sqlFields.')')->order('year,quarter,index_id')->select();
+
+                //compact data to 
+                //quarter  v1 v2 v3 v4
+                //xxxx-01  22 33 44 55
+                $quarterData = $this->convertIndexDataToQuarterData($indexValues);
+
+                //formula calculate & replace
+                $data=array();
+                foreach ($quarterData as $qd) {  //each quarter
+                    $cd =array();
+                    foreach ($graphsInfo as $g){ // each graph
+                        $f = $g['formulaStr'];        
+                        foreach ($qd as $key => $value) { //each field
+                            if (strtolower(substr($key,0,7))!='quarter')
+                                $f =str_replace('id'.$key, $value, $f);
+                        }
+                        $cd[$g['valueField']] = round(eval($f),2);
+                    }
+                    $cd['quarter'] = $qd['quarter'];
+                    array_push($data, $cd);
+                }
                 $indexChartModel->newChart(
                     $chart['html_name'].$quarter,$chart['chart_type'],
-                    $data,'quarter',$valueFields,$chartData
+                    $data,'quarter',$graphsInfo,$chartData
                 );
             }
 
         }
+
+
         $chartStocks = $indexChartModel->getHaveChartStocks();
         $this->defaultStock = $stockid;
         $this->stocks=$chartStocks;
@@ -248,7 +304,93 @@ class StockIndexAction extends Action {
         $this->display("Tpl/StockIndex/ShowIndex.html");
     }
 
+
+    // formula|valueFieldName|title|type|position ; formula|valueFieldName|title|type|position
+    // ; 分割每个graph
+    // | 分割一个graph不同参数
+    // # 分割需要运算的项和运算符
+    // (#id10#/id19#-#id8#)#2     (id10/id19-id18)/2
     
+    private function parseChartParaDetail($type,$para)
+    {
+        $rets = array();
+        if ($type==ChartType_mutilMixedLineColumn || $type==ChartType_serial ){
+            $graphsInfo = explode(';', $para);
+            foreach($graphsInfo as $g){
+                $gpara = explode('|', $g);
+                $formulatStr = $gpara[0];
+                $calcFieldList = array();
+                
+                //for calculate
+                $this->parseArithmetic($formulatStr,$calcFieldList);
+                $ret['formulaStr'] = $formulatStr;
+                $ret['calcFieldList'] = $calcFieldList;
+
+                //for js draw graph
+                $ret['valueField'] = $gpara[1];
+                $ret['title'] = $gpara[2];
+                $ret['type'] = $gpara[3];
+                $ret['position'] = $gpara[4];
+                array_push($rets, $ret);
+            }
+        }
+        return $rets;
+    }
+
+
+    //parse calculate formla
+    //if parameter = (#id1#-#id2#)#/#id3
+    //return 
+    //    formulaStr = '(id1-id2)/id3'
+    //    calcFieldList = array(1,2,3);
+
+    private function parseArithmetic(&$formulaStr, &$calcFieldList)
+    {
+        $formulaArray = explode('#', $formulaStr);
+        $calcFieldList = array();
+        $formulaStr = 'return ';
+        foreach($formulaArray as $f){
+            if (strtolower(substr($f,0,2))=='id'){
+                $temp = substr($f,2);
+                array_push($calcFieldList, $temp);
+            }
+            $formulaStr=$formulaStr.' '.$f;
+        }
+        $formulaStr=$formulaStr.';';
+    }
+
+    // in  indexData like
+    // array(
+    //   0=> array('year'=>2014,'quarter'=>1,'Field1'=>2);
+    //   1=> array('year'=>2014,'quarter'=>2,'Field2'=>2);
+    //   ....
+    // )
+    // return data
+    // array(
+    //   0=>array('quarter'=>201401,'Field1'=>2,'Field2'=>3),
+    //   1=>array('quarter'=>201402,'Field1'=>2,'Field2'=>3),
+    //   2=>array('quarter'=>201403,'Field1'=>2,'Field2'=>3),
+    // )
+    //quarter  v1 v2 v3 v4
+    //xxxx-01  22 33 44 55
+    private function convertIndexDataToQuarterData($indexData)
+    {
+        $quarterData = array();
+        $cnValue = 0;
+        foreach($indexData as $value){
+            if (empty($quarter)){
+                $quarter = $value['year'].'0'.$value['quarter'];
+            }
+            if ($quarter!=$value['year'].'0'.$value['quarter'] ){
+                $quarter = $value['year'].'0'.$value['quarter'];
+                    $cnValue++;
+            }
+            $quarterData[$cnValue]['quarter'] = $quarter;
+            $quarterData[$cnValue][$value['index_id']] = $value['value'];    
+        }
+        return $quarterData;
+    }
+
 }
 
 

@@ -37,12 +37,12 @@ class IndexChartModel extends RelationModel{
       $newData = array();
       foreach ($data as $value) {
         if ($filterType=="morethan"){
-          if ($value[$valueField[0]] > $filterValue)
+          if ($value[$valueFields[0]] > $filterValue)
             array_push($newData,$value);
         }
         if ($filterType=="lessthan"){
-          if ($value[$valueField[0]] < $filterValue){
-            $value[$valueField[0]] = abs($value[$valueField[0]]);
+          if ($value[$valueFields[0]] < $filterValue){
+            $value[$valueFields[0]] = abs($value[$valueFields[0]]);
             array_push($newData,$value);
           }
         }

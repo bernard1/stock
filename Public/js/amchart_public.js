@@ -14,12 +14,17 @@ $(document).ready(function(){
 		$('#'+divName).css('height','300px');
 		$('#'+divName).css('width','70%');
 		$('#'+divName).css('font-size','11px');
-		//if (value.chart_type==0)
-		//	serialChart(divName,value.data,value.categoryField,value.valueFields[0]);
-		//if (value.chart_type==1)
-		//	pieChart(divName,value.data,value.categoryField,value.valueFields[0]);
+		if (value.chart_type==0)
+		{
+			serialChart(divName,value.data,value.categoryField,value.valueFields[0]);
+		}
+		if (value.chart_type==1)
+		{
+			console.log(value);
+			pieChart(divName,value.data,value.categoryField,value.valueFields[0]);
+		}
 		if (value.chart_type==2)
-			multiSerial(divName,value.data,value.categoryField,value.valueFields);
+			mutilMixedLineColumnGraph(divName,value.data,value.categoryField,value.valueFields);
 
 	});
 });
@@ -95,35 +100,20 @@ function serialChart(div,data,categoryField,valueField){
     chart.write(div);
 }
 
-function new_axis(title,color,position,offset,max,min)
-{
-    var newAxis = new AmCharts.ValueAxis();
-     // this line makes the axis to appear detached from plot area
-    newAxis.axisThickness = 3;
-    newAxis.gridAlpha = 0;
-    newAxis.title = title;
-    if (max!=null)
-    	newAxis.maximum  =max;
-    if (min!=null)
-    	newAxis.minimum  =min;
-    if (color!=null)
-		newAxis.axisColor = color;
-	if (offset!=null)
-		newAxis.offset = offset;	
-	if (position!=null)
-    	newAxis.position = position;
 
-	newAxis.reversed = false;
-    chart.addValueAxis(newAxis);
-    return newAxis;
-
-}
-
-function multiSerial(div,data,categoryField,valueFields)
+/*
+*  非常牛B的一个画图函数！
+*  需要有几个图，内容都在graphInfos里
+*       .type:column|line
+*       .valueField
+*       .title
+*       .axisPosition:left:right ,null is left
+* 
+*/
+function mutilMixedLineColumnGraph(div,data,categoryField,graphInfos)
 {
 	console.dir(data);
-	console.dir(categoryField);
-	console.dir(valueFields);
+	console.dir(graphInfos);
 
       // SERIAL CHART
     chart = new AmCharts.AmSerialChart();
@@ -138,24 +128,14 @@ function multiSerial(div,data,categoryField,valueFields)
     categoryAxis.labelRotation = 0;
     categoryAxis.gridPosition = "start";
 
-    // value
-    // in case you don't want to change default settings of value axis,
-    // you don't need to create it, as one value axis is created automatically.
+    $.each(graphInfos, function (i, value) {
+    	var axisPosition = "left";
+    	if (value.position!=null)
+    		axisPosition = value.position;
 
-    // GRAPH
-    $.each(valueFields, function (i, value) {
-    	var axis = new_axis(value,null,(i%2==0)?"right":"left",i*30,null,null);
-    	console.log(value);
-    	var graph = new AmCharts.AmGraph();
-    	graph.valueField = value;
-    	graph.title = i;
-    	graph.valueAxis = axis;
-    	graph.balloonText = "[[value]]";
-    	//graph.type = "serial";
-    	//graph.lineAlpha = 0;
-    	graph.fillAlphas = 0.5;
-    	graph.lineThickness = 2;
-    	graph.type = (i%2==0)?"column":"line";
+
+    	var axis = new_axis(value.title,null,axisPosition,i*50,null,null);
+    	var graph = new_graph(value.title,axis,value.valueField,value.type,0.5);
     	chart.addGraph(graph);
 	});
 
@@ -183,5 +163,48 @@ function multiSerial(div,data,categoryField,valueFields)
     chart.write(div);
 
 
+}
+
+function new_axis(title,color,position,offset,max,min)
+{
+    var newAxis = new AmCharts.ValueAxis();
+     // this line makes the axis to appear detached from plot area
+    newAxis.axisThickness = 3;
+    newAxis.gridAlpha = 0;
+    newAxis.title = title;
+    if (max!=null)
+    	newAxis.maximum  =max;
+    if (min!=null)
+    	newAxis.minimum  =min;
+    if (color!=null)
+		newAxis.axisColor = color;
+	if (offset!=null)
+		newAxis.offset = offset;	
+	if (position!=null)
+    	newAxis.position = position;
+
+	newAxis.reversed = false;
+    chart.addValueAxis(newAxis);
+    return newAxis;
+
+}
+
+function new_graph(title,axis,valueField,type,fillAlphas)
+{
+	var graph = new AmCharts.AmGraph();
+	graph.bullet = "smoothedLine";
+	graph.valueField = valueField;
+	graph.title = title;
+	graph.valueAxis = axis;
+	graph.balloonText = "[[title]]:[[value]]";
+	//graph.lineAlpha = 0;
+	graph.lineThickness = 2;
+	if (type!=null)
+		graph.type = type;
+
+	if (fillAlphas!=null && type!='line')
+		graph.fillAlphas = fillAlphas;
+
+	return graph;
 }
 
