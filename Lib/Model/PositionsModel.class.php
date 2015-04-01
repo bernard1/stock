@@ -8,6 +8,41 @@ class PositionsModel extends RelationModel{
             'mapping_fields'=>'symbol,name,id,market,currency,type',
         ),
     );
+
+    //////////////////////////////////////////////////
+    // each hold stock value and precentage         //
+    // index, symbol, value, percentage             //
+    //////////////////////////////////////////////////
+    public function getStocksValuePercentage($type='long', $order=SORT_DESC)
+    {
+        $positionModel = D("Positions");
+        $allPosition = $positionModel->relation('asset_info')->order('id asc')->select();
+        $holdInfo = array();
+        $holdCount = 0;
+        foreach ($allPosition as $position) {
+            if ($position['asset_info']['type']!=AssetType_Stock) continue;
+            
+            $info = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
+            if ($type=='long' && $info['stockValue']<=0)    continue;
+            if ($type=='short' && $info['stockValue']>=0)    continue;
+            $holdInfo[$holdCount] = $info;
+            $holdInfo[$holdCount]['symbol'] = $position['asset_info']['symbol'];
+            $holdInfo[$holdCount]['name'] = $position['asset_info']['name'];
+            $holdCount++;
+        }
+        $allValue = array_sum(array_column($holdInfo, 'stockValue'));
+
+        foreach ($holdInfo as &$hold) {
+            $hold['percentage'] = round($hold['stockValue']*100/$allValue,2);
+        }
+        $holdInfo = array_sort($holdInfo,'percentage',$order);
+        $holdInfo[$holdCount]['symbol']='total';
+        $holdInfo[$holdCount]['name']='----';
+        $holdInfo[$holdCount]['stockValue']=$allValue;
+        $holdInfo[$holdCount]['percentage']=100;
+
+        return $holdInfo;
+    }
     
 
     //////////////////////////////////////////////////
@@ -44,10 +79,10 @@ class PositionsModel extends RelationModel{
         $stockValue = ($lastClosePrice*$rate*$position[0]['amount']);
 
         return array(
-            'stockCost'=>round($stockCost ,2),
-            'stockValue'=>round($stockValue,2),
-            'profit'=>round($stockValue-$stockCost,2),
-            'profitPercent'=>round((($stockValue-$stockCost)/$allCost['initCash']*100),2)
+            'stockCost'=>floor($stockCost),
+            'stockValue'=>floor($stockValue),
+            'profit'=>floor($stockValue-$stockCost)
+            //'profitPercent'=>floor((($stockValue-$stockCost)/$allCost['initCash']*100),2)
         );
     }
 

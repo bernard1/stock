@@ -36,127 +36,24 @@ class IndexAction extends Action {
     //longPosition,多头仓位
     public function showLongPositionDetail()
     {
-        $holdInfo=array();
-        $retCount = 0;
-        $holdCount = 0;
-        $soldCount = 0;
-        $totalCost = 0;
-        $totalValue = 0;
-        $totalProfit = 0;
-        $totalPercent = 0;
 
         $positionModel = D("Positions");
-        $indexChartModel = D("IndexChart");
-
-        //shortPosition, 空头仓位
-        //longPosition,多头仓位
-        $stockCost = $positionModel->getAllPositionCost();
-
-        $allPosition = $positionModel->relation('asset_info')->order('id asc')->select();
-        foreach ($allPosition as $position) {
-
-            if ($position['asset_info']['type']==AssetType_Stock){                
-                
-                $holdInfo[$holdCount] = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
-                $holdInfo[$holdCount]['symbol'] = $position['asset_info']['symbol'];
-                $holdInfo[$holdCount]['name'] = $position['asset_info']['name'];
-
-                //if borrow stock to sell. value is<0 , not need calculate it to total.
-                //as well as not need calculate cost.
-                if ($holdInfo[$holdCount]['stockValue']>0){  //longPosition
-                    $totalValue += $holdInfo[$holdCount]['stockValue'];
-                    $totalCost += $holdInfo[$holdCount]['stockCost'];
-                    $totalProfit += $holdInfo[$holdCount]['profit'];
-
-                }
-                else if($holdInfo[$holdCount]['stockValue']==0){ //already sell , but need sum profile
-                    $soldInfo[$soldCount++] = $holdInfo[$holdCount];
-                    $totalProfit += $holdInfo[$holdCount]['profit'];
-                    $totalCost += $holdInfo[$holdCount]['stockCost'];
-                    $soldProfit += $holdInfo[$holdCount]['profit'];
-                    $soldCost += $holdInfo[$holdCount]['stockCost'];
-                    unset($holdInfo[$holdCount]);
-                }
-                else{ 
-                    continue;
-                }
-
-                $holdCount++;
-            }
-        }
-        $holdInfo[$holdCount]['symbol']='total:';
-        $holdInfo[$holdCount]['stockCost'] = $totalCost;
-        $holdInfo[$holdCount]['stockValue'] = $totalValue;
-        $holdInfo[$holdCount]['profit'] = $totalProfit;
-        $holdInfo[$holdCount]['profitPercent'] = round(($totalValue-$totalCost)/$stockCost['initCash']*100,2);
-
-
-        $soldInfo[$soldCount]['symbol']='total:';
-        $soldInfo[$soldCount]['stockCost'] = $soldCost;
-        $soldInfo[$soldCount]['stockValue'] = 0;
-        $soldInfo[$soldCount]['profit'] = $soldProfit;
-        $soldInfo[$soldCount]['profitPercent'] = round((0-$soldCost)/$stockCost['initCash']*100,2);
-
-
-        $this->soldValues = $soldInfo;
-        $this->holdValues = $holdInfo;
+        $this->holdValues =$positionModel->getStocksValuePercentage();        
         $this->display("Tpl/Index/longPositionDetail.html");
     }
 
     //shortPosition,空头仓位
     public function showShortPositionDetail()
     {
-        $retInfo=array();
-        $retCount = 0;
-        $totalCost = 0;
-        $totalValue = 0;
-        $totalProfit = 0;
-        $totalPercent = 0;
-
         $positionModel = D("Positions");
-        $indexChartModel = D("IndexChart");
-
-        //shortPosition, 空头仓位
-        //longPosition,多头仓位
-        $stockCost = $positionModel->getAllPositionCost();
-
-        $allPosition = $positionModel->relation('asset_info')->order('id asc')->select();
-        foreach ($allPosition as $position) {
-
-            if ($position['asset_info']['type']==AssetType_Stock){                
-                
-                $retInfo[$retCount] = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
-                $retInfo[$retCount]['symbol'] = $position['asset_info']['symbol'];
-                $retInfo[$retCount]['name'] = $position['asset_info']['name'];
-                //if borrow stock to sell. value is<0 , not need calculate it to total.
-                //as well as not need calculate cost.
-                if ($retInfo[$retCount]['stockValue']<0){  //longPosition
-                    $totalValue += $retInfo[$retCount]['stockValue'];
-                    $totalCost += $retInfo[$retCount]['stockCost'];
-                }
-                else
-                {
-                    continue;
-                }
-
-                $totalProfit += $retInfo[$retCount]['profit'];
-                $retCount++;
-            }
-        }
-        $retInfo[$retCount]['symbol']='total:';
-        $retInfo[$retCount]['stockCost'] = $totalCost;
-        $retInfo[$retCount]['stockValue'] = $totalValue;
-        $retInfo[$retCount]['profit'] = $totalProfit;
-        $retInfo[$retCount]['profitPercent'] = round(($totalValue-$totalCost)/$stockCost['initCash']*100,2);
-
-
-        $this->stockValues = $retInfo;
-        $this->display("Tpl/Index/shortPositionDetail.html");
+        $this->holdValues =$positionModel->getStocksValuePercentage('short');
+        $this->display("Tpl/Index/shortPositionDetail.html");       
     }
 
 
     public function showStockProfitChart()
     {
+
 
         $retInfo=array();
         $retCount = 0;
@@ -195,22 +92,22 @@ class IndexAction extends Action {
 
         //value pie
         $indexChartModel->newChart(
-            "longValueConsist",ChartType_pie,$pieValueData,'symbol','value',$chartData
+            "longValueConsist",ChartType_pie,$pieValueData,'symbol',array('value'),$chartData
         );
 
         $indexChartModel->newChart(
-            "shortValueConsist",ChartType_pie,$pieValueData,'symbol','value',$chartData,"lessthan",0
+            "shortValueConsist",ChartType_pie,$pieValueData,'symbol',array('value'),$chartData,"lessthan",0
         );
 
 
         //profit_win consist pie
         $indexChartModel->newChart(
-            "profitWinConsist",ChartType_pie,$pieValueData,'symbol','profit_win',$chartData,"morethan",5000
+            "profitWinConsist",ChartType_pie,$pieValueData,'symbol',array('profit_win'),$chartData,"morethan",5000
         );
 
         //profit_lost consist pie
         $indexChartModel->newChart(
-            "profitLostConsist",ChartType_pie,$pieValueData,'symbol','profit_lost',$chartData,"morethan",0
+            "profitLostConsist",ChartType_pie,$pieValueData,'symbol',array('profit_lost'),$chartData,"morethan",0
         );
 
         //different market pie
@@ -224,7 +121,7 @@ class IndexAction extends Action {
             }
         }
         $indexChartModel->newChart(
-            "marketConsist",ChartType_pie,$stockMarket,'market','value',$chartData
+            "marketConsist",ChartType_pie,$stockMarket,'market',array('value'),$chartData
         );
         //end different value pie
 

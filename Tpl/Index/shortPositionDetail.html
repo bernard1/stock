@@ -19,10 +19,10 @@
 <include file="Header" />
 <div class="w-layer w-layer-full">
     <table border="1" width="100%">
-    <tr><td>symbol</td><td>cost</td><td>value</td><td>percent</td></tr>
-    <volist name="stockValues" id="vo">
+    <tr><td>symbol</td><td>value</td><td>percentage</td></tr>
+        <volist name="holdValues" id="vo">
     <tr>
-        <td>{$vo.symbol}{$vo.name}</td><td>{$vo.stockCost}</td><td>{$vo.stockValue}</td><td>{$vo.profitPercent}</td>
+        <td>{$vo.symbol}{$vo.name}</td><td>{$vo.stockValue}</td><td>{$vo.percentage}</td>
     </tr>
     </volist>
     </table>
