@@ -38,7 +38,38 @@ class IndexAction extends Action {
     {
 
         $positionModel = D("Positions");
-        $this->holdValues =$positionModel->getStocksValuePercentage();        
+        $this->holdValues =$positionModel->getStocksValuePercentage();
+        $allPosition = $positionModel->relation('asset_info')->order('id asc')->select();
+
+        $chartData = array();
+        $indexChartModel = D("IndexChart");
+        $pieData = $this->holdValues;
+        unset($pieData[count($pieData)-1]);  // remove total line
+
+        //value consist percent pie
+        $indexChartModel->newChart(
+            "longValueConsist",ChartType_pie,$pieData,'symbol',array('stockValue'),$chartData
+        );
+        //different market pie
+        $stockMarket = D("StockInfo")->where('type='.AssetType_Stock)->field('market')->group('market')->select();
+        foreach ($stockMarket as &$market) {
+            foreach($allPosition as $position){
+                if (strtolower($position['asset_info']['market']) == strtolower($market['market'])){
+                    $stockValue = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
+                    if ($stockValue['stockValue']>0)
+                        $market['value'] +=$stockValue['stockValue'];
+                }
+            }
+        }
+        $indexChartModel->newChart(
+            "longMarketConsist",ChartType_pie,$stockMarket,'market',array('value'),$chartData
+        );
+
+        $this->assign('chartData',json_encode($chartData));
+
+
+
+
         $this->display("Tpl/Index/longPositionDetail.html");
     }
 
@@ -47,6 +78,37 @@ class IndexAction extends Action {
     {
         $positionModel = D("Positions");
         $this->holdValues =$positionModel->getStocksValuePercentage('short');
+        $allPosition = $positionModel->relation('asset_info')->order('id asc')->select();
+
+        $chartData = array();
+        $indexChartModel = D("IndexChart");
+        $pieData = $this->holdValues;
+        unset($pieData[count($pieData)-1]);  // remove total line
+
+        //value consist percent pie
+        $indexChartModel->newChart(
+            "shortValueConsist",ChartType_pie,$pieData,'symbol',array('stockValue'),$chartData,"lessthan",0
+        );
+
+        //different market pie
+        $stockMarket = D("StockInfo")->where('type='.AssetType_Stock)->field('market')->group('market')->select();
+        foreach ($stockMarket as &$market) {
+            foreach($allPosition as $position){
+                if (strtolower($position['asset_info']['market']) == strtolower($market['market'])){
+                    $stockValue = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
+                    if ($stockValue['stockValue']<0)
+                        $market['value'] +=abs($stockValue['stockValue']);
+                }
+            }
+        }
+
+        $indexChartModel->newChart(
+            "shortMarketConsist",ChartType_pie,$stockMarket,'market',array('value'),$chartData
+        );
+        
+
+        $this->assign('chartData',json_encode($chartData));
+
         $this->display("Tpl/Index/shortPositionDetail.html");       
     }
 
@@ -90,14 +152,6 @@ class IndexAction extends Action {
         }
         $chartData = array();
 
-        //value pie
-        $indexChartModel->newChart(
-            "longValueConsist",ChartType_pie,$pieValueData,'symbol',array('value'),$chartData
-        );
-
-        $indexChartModel->newChart(
-            "shortValueConsist",ChartType_pie,$pieValueData,'symbol',array('value'),$chartData,"lessthan",0
-        );
 
 
         //profit_win consist pie
@@ -110,22 +164,9 @@ class IndexAction extends Action {
             "profitLostConsist",ChartType_pie,$pieValueData,'symbol',array('profit_lost'),$chartData,"morethan",0
         );
 
-        //different market pie
-        $stockMarket = D("StockInfo")->where('type='.AssetType_Stock)->field('market')->group('market')->select();
-        foreach ($stockMarket as &$market) {
-            foreach($allPosition as $position){
-                if ($position['asset_info']['market'] == $market['market']){
-                    $stockValue = $positionModel->getEachStockCostVaue($position['asset_info']['symbol']);
-                    $market['value'] +=$stockValue['stockValue'];
-                }
-            }
-        }
-        $indexChartModel->newChart(
-            "marketConsist",ChartType_pie,$stockMarket,'market',array('value'),$chartData
-        );
+     
         //end different value pie
 
-        
 
         $this->assign('chartData',json_encode($chartData));
 
