@@ -167,13 +167,36 @@ class IndexAction extends Action {
      
         //end different value pie
 
-
         $this->assign('chartData',json_encode($chartData));
 
         $this->display("Tpl/Index/StockProfitChart.html");
 
 
     }
+
+
+    public function showRzrq()
+    {
+        $rzrqSummary = D("rzrqSummary");
+        $indexChartModel = D("IndexChart");
+
+        $all = $rzrqSummary->select();
+        $chartData  = array();
+         $indexChartModel->newChart(
+            "rz",ChartType_serial,$all,'date',array('today_rz_sum'),$chartData
+        );
+
+         $indexChartModel->newChart(
+            "rq",ChartType_serial,$all,'date',array('today_rj_sum'),$chartData
+        );
+
+        $this->assign('chartData',json_encode($chartData));
+
+        $this->display("Tpl/Index/StockRzrq.html");
+    }
+
+
+
 
 	public function ajaxGetMarketValue(){
 
@@ -197,10 +220,15 @@ class IndexAction extends Action {
 
 
 
-    public function showOperation(){
+    public function showOperation($marketType = 'NASDAQ'){
+        $market = D('StockInfo')->group('market')->field('market')->select();
+        $this->market = $market;
 
-        $stocks = D('StockInfo')->select();
+
+        $stockModel = D('StockInfo');
+        $stocks = $stockModel->where('market="'.$marketType.'"')->select();
         $this->stocks = $stocks;
+
 
         $reasons = D('op_reasons')->order('id')->select();
         $this->reasons = $reasons;

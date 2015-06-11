@@ -14,8 +14,12 @@ $(document).ready(function(){
 		$('#'+divName).css('height','300px');
 		$('#'+divName).css('width','70%');
 		$('#'+divName).css('font-size','11px');
+        console.log('chart_type:'+value.chart_type);
 		if (value.chart_type==0)
 		{
+            console.log('category:'+value.categoryField);
+            console.log('value:'+value.valueFields[0]);
+            console.log('datalen:'+value.data.length);
 			serialChart(divName,value.data,value.categoryField,value.valueFields[0]);
 		}
 		if (value.chart_type==1)

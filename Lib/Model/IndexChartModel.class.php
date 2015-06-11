@@ -93,7 +93,7 @@ class IndexChartModel extends RelationModel{
                   foreach ($quarterData as $qd) {  //each quarter
                       $cd =array();
                       foreach ($graphsInfo as $g){ // each graph
-                          $f = $g['formulaStr'];        
+                          $f = $g['formulaStr'];
                           foreach ($qd as $key => $value) { //each field
                               if (strtolower(substr($key,0,7))!='quarter')
                                   $f =str_replace('id'.$key, $value, $f);

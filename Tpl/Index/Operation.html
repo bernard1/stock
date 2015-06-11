@@ -16,9 +16,18 @@
 <body>
 <include file="Header" />
 <div >
+<br>
+<br>
     <table>
     <tr>
-        <td>stock:</td>
+        <td><font face="verdana" color="green">market:</font></td>
+            <td><foreach name="market" item="vo">
+                    <a href="{$baseUrl}Index/showOperation/marketType/{$vo.market}">{$vo.market}</a>&nbsp;
+                </foreach>
+        </td>
+    </tr>
+    <tr>
+        <td><font face="verdana" color="green">stock:</font></td>
         <td>
             <select id="stock" name="stock" >
                 <foreach name="stocks" item="vo">
@@ -28,15 +37,15 @@
         </td>
     </tr>
     <tr>
-        <td>amount:</td>
+        <td><font face="verdana" color="green">amount:</font></td>
         <td><input id="amount" type="inputbox" value="0"></td>
     </tr>
     <tr>
-        <td>price:</td>
+        <td><font face="verdana" color="green">price:</font></td>
         <td><input id="price" type="inputbox" value="0"></td>
     </tr>
     <tr>
-     <td>reason:</td>
+     <td><font face="verdana" color="green">reason:</font></td>
         <td>
             <select id="reason" name="reason" >
                 <foreach name="reasons" item="vo">

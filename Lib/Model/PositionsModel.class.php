@@ -19,6 +19,8 @@ class PositionsModel extends RelationModel{
         $allPosition = $positionModel->relation('asset_info')->order('id asc')->select();
         $holdInfo = array();
         $holdCount = 0;
+
+
         foreach ($allPosition as $position) {
             if ($position['asset_info']['type']!=AssetType_Stock) continue;
             
