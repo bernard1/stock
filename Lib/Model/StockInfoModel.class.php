@@ -3,8 +3,8 @@ class StockInfoModel extends RelationModel{
     protected $tableName = 'asset_info';
 
     public function getIDFromSymbol($symbol){
-        $stockInfo = $this->where('symbol='.$symbol)->select();
-        if ( !empty($stockInfo) )    return $stockInfo['id'];
+        $stockInfo = $this->where('symbol="'.$symbol.'"')->select();
+        if ( !empty($stockInfo) )    return $stockInfo[0]['id'];
         return '';
     }
 

@@ -30,7 +30,7 @@ class IndexChartModel extends RelationModel{
       return $haveChartStocks;
   }
 
-  public function newChart($html_name,$chartType,$data,$categoryField,$valueFields,&$array,$filterType="morethan",$filterValue=0){
+  public function newChart($html_name,$chartType,$data,$categoryField,$valueFields,&$array,$filterType="morethan",$filterValue=0,$chartHeight=300){
 
     if ($chartType == ChartType_pie) //ignore zero data when pie
     {
@@ -54,6 +54,7 @@ class IndexChartModel extends RelationModel{
     }
     $chart = array(
       'html_name'=>$html_name,
+      'chartHeight'=>$chartHeight,
       'chart_type'=>$chartType,
       'data'=>$newData,
       'categoryField'=>$categoryField,
@@ -207,6 +208,8 @@ class IndexChartModel extends RelationModel{
                   $chart['html_name'].$quarter,$chart['chart_type'],
                   $data,'quarter',$graphsInfo,$chartData
               );
+              MYDUMP($graphsInfo);
+              die;
           }
 
       }

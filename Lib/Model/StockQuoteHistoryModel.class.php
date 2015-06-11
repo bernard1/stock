@@ -26,7 +26,6 @@ class StockQuoteHistoryModel extends RelationModel{
         $endDate = get_date(now());
         $beginDate = get_date($beginDate);
 
-
         $symbol = D('StockInfo')->getSymbolFromID($stock_id);
         $objYahooStock = new YahooStock; 
 		$quoteHistory = $objYahooStock->getQuoteHistory($symbol,$beginDate,$endDate);
@@ -49,6 +48,27 @@ class StockQuoteHistoryModel extends RelationModel{
 		return true;
 	}
 
+
+
+	public function getStockQuoteHistory($symbol,$beginDate,$endDate){
+		include_once "Include/define.php";
+        include_once "Include/functions.php";
+        include_once "Include/class.yahoostock.php";
+
+        $objYahooStock = new YahooStock; 
+		$quoteHistory = $objYahooStock->getQuoteHistory($symbol,$beginDate,$endDate);
+
+		if (empty($quoteHistory)) return false;
+		$arr = array();
+
+		//$data['date'] = price;
+		foreach ($quoteHistory as $value) {
+			$arr[$value[0]] = $value[4];
+		}
+		return $arr;
+	}
+
+
 	//get close price with id
 	public function getLastStockQuoteWithID($stock_id)
 	{
@@ -69,7 +89,7 @@ class StockQuoteHistoryModel extends RelationModel{
 	public function getLastStockQuoteWithSymbol($symbol)
 	{
 		$id = D('StockInfo')->getIDFromSymbol($symbol);
-		return getLastStockQuote($id);
+		return $this->getLastStockQuoteWithID($id);
 	}
 
 
@@ -86,6 +106,20 @@ class StockQuoteHistoryModel extends RelationModel{
 			return $quote[0]['close'];
 
 	}
+	public function getQuoteFromDateWithSymbol($symbol,$date){
+
+		$stockModel = D('StockInfo');
+		$stock_id = $stockModel->getIDFromSymbol($symbol);
+		$this->updateStockQuote($stock_id);
+		$quote = $this->where('date>="'.$date.'" AND stock_id='.$stock_id)->select();
+
+		$return = array();
+		foreach ($quote as $value) {
+			$return[$value['date']]=$value['close'];
+		}
+		return $return;
+	}
+
 
 	public function getLastQuoteFromSina($symbol)
 	{

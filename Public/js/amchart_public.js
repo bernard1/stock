@@ -11,7 +11,7 @@ $(document).ready(function(){
 	$.each(chartData, function (i, value) {
 		var divName = 'chartDiv'+i;
 		$("#chartParent").append(value.html_name+"<div id='"+divName+"'></div>");
-		$('#'+divName).css('height','300px');
+		$('#'+divName).css('height',value.chartHeight+'px');
 		$('#'+divName).css('width','70%');
 		$('#'+divName).css('font-size','11px');
         console.log('chart_type:'+value.chart_type);

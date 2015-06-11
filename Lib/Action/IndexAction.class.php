@@ -177,18 +177,32 @@ class IndexAction extends Action {
 
     public function showRzrq()
     {
-        $rzrqSummary = D("rzrqSummary");
-        $indexChartModel = D("IndexChart");
+        $chartData  = array();
+      /*  $sql = 'SELECT sum(today_rz_sum) as today_rz_sum, sum(today_rj_sum) as today_rj_sum,date FROM rzrq_summary WHERE date>"2015-04-01" GROUP BY date ORDER BY date asc';
 
-        $all = $rzrqSummary->select();
+        $rz = $rzrqSummary->query($sql);
         $chartData  = array();
          $indexChartModel->newChart(
-            "rz",ChartType_serial,$all,'date',array('today_rz_sum'),$chartData
+            "ShangHai_rz",ChartType_serial,$rz,'date',array('today_rz_sum'),$chartData
         );
 
+        //融资增量
+        $sql = 'SELECT m1.id, m1.date,m1.today_rz_sum,COALESCE(m1.today_rz_sum - (SELECT m2.today_rz_sum FROM rzrq_summary m2 WHERE m2.id = m1.id - 1 and market=1), 0) AS increase FROM rzrq_summary m1 where market=1 order by m1.date asc'; 
+        $rz_increase = $rzrqSummary->query($sql);
          $indexChartModel->newChart(
-            "rq",ChartType_serial,$all,'date',array('today_rj_sum'),$chartData
+            "ShangHai_increase",ChartType_serial,$rz_increase,'date',array('increase'),$chartData
         );
+
+
+         $indexChartModel->newChart(
+            "ShenZhen_rz",ChartType_serial,$rz,'date',array('today_rz_sum'),$chartData
+        );
+
+    */  
+        //深圳 指数,融资,每日增量
+        $RZRQModel = D('RZRQ');
+        $chartData = $RZRQModel->makeSummaryChart(1);
+
 
         $this->assign('chartData',json_encode($chartData));
 
