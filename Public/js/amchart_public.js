@@ -2,7 +2,7 @@
 
 
 
-
+var _color = [ "#cc6600","#4169E1", "#c0c0c0","#00cccc"];
 
 
 $(document).ready(function(){ 
@@ -129,17 +129,28 @@ function mutilMixedLineColumnGraph(div,data,categoryField,graphInfos)
     // AXES
     // category
     var categoryAxis = chart.categoryAxis;
-    categoryAxis.labelRotation = 0;
+    categoryAxis.labelRotation = 45;
     categoryAxis.gridPosition = "start";
+        categoryAxis.axisColor = "#DADADA";
+    categoryAxis.startOnAxis = true;
+    categoryAxis.dateFormats = "MMM DD";
 
+
+    var cnLeftPosition = 0;
+    var cnRightPosition = 0;
     $.each(graphInfos, function (i, value) {
     	var axisPosition = "left";
-    	if (value.position!=null)
+    	if (value.position!=null){
     		axisPosition = value.position;
+            if (value.position=='left')
+                posX = (cnLeftPosition++)*80;
+            if (value.position=='right')
+                posX = (cnRightPosition++)*80;
+        }
 
 
-    	var axis = new_axis(value.title,null,axisPosition,i*80,null,null);
-    	var graph = new_graph(value.title,axis,value.valueField,value.type,0.5);
+    	var axis = new_axis(_color[i],value.title,axisPosition,posX,null,null);
+    	var graph = new_graph(_color[i],value.title,axis,value.valueField,value.type,0.5);
     	chart.addGraph(graph);
 	});
 
@@ -155,12 +166,39 @@ function mutilMixedLineColumnGraph(div,data,categoryField,graphInfos)
 
 
 
-    // CURSOR
-    var chartCursor = new AmCharts.ChartCursor();
-    chartCursor.cursorAlpha = 0;
-    chartCursor.zoomable = false;
-    chartCursor.categoryBalloonEnabled = false;
+
+    // SCROLLBAR
+    var chartScrollbar = new AmCharts.ChartScrollbar();
+    chartScrollbar.graphType = "line";
+    chartScrollbar.backgroundColor = "#bebebe";
+    chartScrollbar.scrollbarHeight = 35;
+    chartScrollbar.color = "#000000";
+    chartScrollbar.gridColor = "#000000";
+    chartScrollbar.gridAlpha = 1;
+        //  chartScrollbar.scrollbarHeight = 50;
+        //   chartScrollbar.gridCount = 50;
+        // chartScrollbar.graphLineColor = pressure_color;
+        //chartScrollbar.graphFillColor = pressure_color;
+        //  chartScrollbar.graphType = 'line';
+    chartScrollbar.selectedBackgroundColor = "#bebebe";
+        //  chartScrollbar.selectedGraphFillColor = "#ff0000";
+        //  chartScrollbar.selectedGraphLineColor = "#00ff00";
+        //chartScrollbar.dragIconHeight = 100;
+        //chartScrollbar.dragIconWidth = 15;
+    chartScrollbar.autoGridCount = true;                
+    chart.addChartScrollbar(chartScrollbar);
+
+
+   // CURSOR
+    chartCursor = new AmCharts.ChartCursor();
+    chartCursor.cursorPosition = "mouse";
+    chartCursor.categoryBalloonDateFormat = "DD MMMM";
+    //chartCursor.pan = true;
+    chartCursor.valueLineEnabled=true;
+    chartCursor.valueLineBalloonEnabled=true;
     chart.addChartCursor(chartCursor);
+
+
 
     chart.creditsPosition = "top-right";
 
@@ -169,7 +207,7 @@ function mutilMixedLineColumnGraph(div,data,categoryField,graphInfos)
 
 }
 
-function new_axis(title,color,position,offset,max,min)
+function new_axis(color,title,position,offset,max,min)
 {
     var newAxis = new AmCharts.ValueAxis();
      // this line makes the axis to appear detached from plot area
@@ -180,8 +218,10 @@ function new_axis(title,color,position,offset,max,min)
     	newAxis.maximum  =max;
     if (min!=null)
     	newAxis.minimum  =min;
-    if (color!=null)
+    if (color!=null){
+        console.log(color);
 		newAxis.axisColor = color;
+    }
 	if (offset!=null)
 		newAxis.offset = offset;	
 	if (position!=null)
@@ -193,7 +233,7 @@ function new_axis(title,color,position,offset,max,min)
 
 }
 
-function new_graph(title,axis,valueField,type,fillAlphas)
+function new_graph(color,title,axis,valueField,type,fillAlphas)
 {
 	var graph = new AmCharts.AmGraph();
 	graph.bullet = "smoothedLine";
@@ -205,6 +245,9 @@ function new_graph(title,axis,valueField,type,fillAlphas)
 	graph.lineThickness = 2;
 	if (type!=null)
 		graph.type = type;
+
+    if (color!=null)
+        graph.lineColor = color;
 
 	if (fillAlphas!=null && type!='line')
 		graph.fillAlphas = fillAlphas;

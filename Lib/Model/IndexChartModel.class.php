@@ -208,8 +208,6 @@ class IndexChartModel extends RelationModel{
                   $chart['html_name'].$quarter,$chart['chart_type'],
                   $data,'quarter',$graphsInfo,$chartData
               );
-              MYDUMP($graphsInfo);
-              die;
           }
 
       }

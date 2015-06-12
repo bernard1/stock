@@ -16,7 +16,7 @@ class RZRQModel extends RelationModel{
         $data = $rzrqSummary->query($sql);
 
         for($i=1;$i<count($data);$i++){
-			$data[$i]['increase'] = $data[$i][$field] -$data[$i-1][$field];
+			$data[$i]['increase'] = round($data[$i][$field] -$data[$i-1][$field],2);
         }
         return $data;
 
@@ -50,9 +50,9 @@ class RZRQModel extends RelationModel{
 		$indexChartModel = D("IndexChart");
 		$data =  $this->getSummaryIncreaseData("today_rz_sum",$market);
 		$graph = array(
-            0=>array('valueField'=>'today_rz_sum','title'=>'融资总量','type' => 'line','position' => 'left'),
-            1=>array('valueField'=>'increase','title'=>'融资增量','type' => 'column','position' => 'right'),
-            2=>array('valueField'=>'quote','title'=>'走势','type' => 'line','position' => 'right')
+            0=>array('valueField'=>'quote','title'=>'指数','type' => 'line','position' => 'left'),
+            1=>array('valueField'=>'today_rz_sum','title'=>'融资总量','type' => 'line','position' => 'right'),
+            2=>array('valueField'=>'increase','title'=>'融资增量','type' => 'column','position' => 'right')
         );
         
         $stockModel =  D('StockQuoteHistory');
