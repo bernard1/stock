@@ -180,10 +180,6 @@ class IndexAction extends Action {
         $chartData  = array();
    
 
-         $objYahooStock = new YahooStock; 
-         MYDUMP($objYahooStock->getQuoteHistory("000001.SS"));
-         die;
-
         $RZRQModel = D('RZRQ');
 
         $chartData = array();
