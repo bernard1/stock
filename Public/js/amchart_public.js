@@ -138,7 +138,7 @@ function mutilMixedLineColumnGraph(div,data,categoryField,graphInfos)
     		axisPosition = value.position;
 
 
-    	var axis = new_axis(value.title,null,axisPosition,i*50,null,null);
+    	var axis = new_axis(value.title,null,axisPosition,i*80,null,null);
     	var graph = new_graph(value.title,axis,value.valueField,value.type,0.5);
     	chart.addGraph(graph);
 	});

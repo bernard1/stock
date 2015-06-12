@@ -11,9 +11,13 @@ class RZRQModel extends RelationModel{
 	{
 
 		$rzrqSummary = D("rzrqSummary");
-		$sql = 'SELECT m1.date,m1.'.$field.'/10000 as '.$field.',COALESCE(m1.'.$field.' - (SELECT m2.'.$field.' FROM rzrq_summary m2 WHERE m2.id = m1.id - 1 and market='.$market.'), 0)/10000 AS increase FROM rzrq_summary m1 where market='.$market.' order by m1.date asc'; 
+		//$sql = 'SELECT m1.date,m1.'.$field.'/10000 as '.$field.',COALESCE(m1.'.$field.' - (SELECT m2.'.$field.' FROM rzrq_summary m2 WHERE m2.id = m1.id - 1 and market='.$market.'), 0)/10000 AS increase FROM rzrq_summary m1 where market='.$market.' order by m1.date asc'; 
+		$sql = 'SELECT '.$field.'/10000 as '.$field.',date FROM rzrq_summary WHERE market='.$market.' GROUP BY date ORDER BY date asc';
         $data = $rzrqSummary->query($sql);
-        echo $sql;
+
+        for($i=1;$i<count($data);$i++){
+			$data[$i]['increase'] = $data[$i][$field] -$data[$i-1][$field];
+        }
         return $data;
 
 	}
