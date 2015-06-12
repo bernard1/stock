@@ -126,6 +126,7 @@ function mutilMixedLineColumnGraph(div,data,categoryField,graphInfos)
     chart.startDuration = 1;
     chart.gridAboveGraphs =true;
     chart.type = "serial";
+    chart.pathToImages = '../Public/img/charts/';
     // AXES
     // category
     var categoryAxis = chart.categoryAxis;

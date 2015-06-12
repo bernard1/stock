@@ -122,7 +122,11 @@ class StockQuoteHistoryModel extends RelationModel{
 		return $return;
 	}
 
-
+	//指数
+	//http://hq.sinajs.cn/list=s_sh000001
+	//http://hq.sinajs.cn/list=s_sz399001
+	//个股
+	//http://hq.sinajs.cn/list=sh601006
 	public function getLastQuoteFromSina($symbol)
 	{
 		$url = "http://hq.sinajs.cn/list=".$symbol;
