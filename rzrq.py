@@ -150,7 +150,8 @@ def processSZFile(fsummary,feachstock,timestamp):
 			j = j+1
 			if (j<=2): #id and name
 				r[x] = alltd[x].text
-				continue  
+				continue 
+			print  alltd[x].text
 			number = str(alltd[x].text)
 			number = number.replace(",","")
 			r[x] = str(int(number)/10000)
@@ -163,7 +164,7 @@ def processSZFile(fsummary,feachstock,timestamp):
 		sql = sql+','+r[stock_today_rj_sell_volume]
 		sql = sql+','+r[stock_today_rj_margin]
 		sql = sql+','+r[stock_today_rzrj_margin]+', 2, "'+strDate+'")'
-		print sql
+		#print sql
 		singleQuery(sql)
 
 
@@ -201,8 +202,8 @@ def downAndProcessSZFile(localPath,tstampDate):
 	pathfilesummary = localPath+'sz/s'+fdate+'.html'
 	pathfileeachstock = localPath+'sz/e'+fdate+'.html'
 
-	#print downloadFileFromWeb(pathfilesummary,fsummary)
-	#print downloadFileFromWeb(pathfileeachstock,feachstock)
+	print downloadFileFromWeb(pathfilesummary,fsummary)
+	print downloadFileFromWeb(pathfileeachstock,feachstock)
 
 	processSZFile(pathfilesummary,pathfileeachstock,tstampDate)
 
@@ -213,7 +214,7 @@ def downloadFileFromWeb(pathfile,urlname):
 		print urlname
 		response = urllib2.urlopen(urlname)
 		html = response.read()
-		file = open(pathfile, 'a+')
+		file = open(pathfile, 'w+')
 		file.write(html)
 		file.close()
 		return 1
@@ -228,7 +229,7 @@ if strDate == None :
 else:
 	strDate = strDate[0].strftime("%Y-%m-%d")
 
-strDate = '2014-11-01'
+strDate = '2015-05-29'
 
 tstampDate = time.mktime(time.strptime(strDate, "%Y-%m-%d"))
 tstampNow = time.mktime(time.strptime( datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d'), "%Y-%m-%d"))
@@ -236,7 +237,7 @@ tstampNow = time.mktime(time.strptime( datetime.fromtimestamp(time.time()).strft
 
 while (tstampDate<tstampNow):
 	if datetime.fromtimestamp(tstampDate).weekday()<5:
-		#downAndProcessSHFile(localPath,tstampDate)
+		downAndProcessSHFile(localPath,tstampDate)
 		downAndProcessSZFile(localPath,tstampDate)
 	tstampDate +=3600*24
 

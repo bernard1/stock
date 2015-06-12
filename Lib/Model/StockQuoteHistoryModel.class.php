@@ -6,12 +6,16 @@ class StockQuoteHistoryModel extends RelationModel{
 
 
 	//check newest price history and save to database.
-	public function updateStockQuote($stock_id)
+	public function updateStockQuote($stock_id, $fromDate='')
 	{
 		include_once "Include/define.php";
         include_once "Include/functions.php";
         include_once "Include/class.yahoostock.php";
-        $lastQHDate = $this->field('max(date) as maxDate')->where('stock_id='.$stock_id)->select();
+
+        if (!empty($fromDate))
+        	$lastQHDate[0]['maxDate']=$fromDate;
+        else
+        	$lastQHDate = $this->field('max(date) as maxDate')->where('stock_id='.$stock_id)->select();
 
         //one month ago
 		if (empty($lastQHDate[0]['maxDate'])){  
@@ -106,11 +110,9 @@ class StockQuoteHistoryModel extends RelationModel{
 			return $quote[0]['close'];
 
 	}
-	public function getQuoteFromDateWithSymbol($symbol,$date){
+	public function getQuoteFromDateWithID($stock_id,$date){
 
-		$stockModel = D('StockInfo');
-		$stock_id = $stockModel->getIDFromSymbol($symbol);
-		$this->updateStockQuote($stock_id);
+		$this->updateStockQuote($stock_id,$date);
 		$quote = $this->where('date>="'.$date.'" AND stock_id='.$stock_id)->select();
 
 		$return = array();

@@ -201,7 +201,10 @@ class IndexAction extends Action {
     */  
         //深圳 指数,融资,每日增量
         $RZRQModel = D('RZRQ');
-        $chartData = $RZRQModel->makeSummaryChart(1);
+
+        $chartData = array();
+        $RZRQModel->makeSummaryChart(Market_ShangHai,"上海 指数,融资,每日增量",$chartData );
+        $RZRQModel->makeSummaryChart(Market_ShenZhen,"深圳 指数,融资,每日增量",$chartData );
 
 
         $this->assign('chartData',json_encode($chartData));

@@ -28,5 +28,8 @@
     define("QUARTER_YEAR_ANALYSIS", 2);
 
 
+    define("Market_ShangHai",1);
+    define("Market_ShenZhen",2);
+
 ?>
 
