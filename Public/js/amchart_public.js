@@ -10,8 +10,13 @@ $(document).ready(function(){
 	$(document.body).append("<div id='chartParent'></div>");
 	$.each(chartData, function (i, value) {
 		var divName = 'chartDiv'+i;
+        var height = 350;
+        console.log(value.chartHeight);
+        if (typeof(value.chartHeight)!='undefined'){
+            height = value.chartHeight;
+        }
 		$("#chartParent").append(value.html_name+"<div id='"+divName+"'></div>");
-		$('#'+divName).css('height',value.chartHeight+'px');
+		$('#'+divName).css('height',height+'px');
 		$('#'+divName).css('width','70%');
 		$('#'+divName).css('font-size','11px');
         console.log('chart_type:'+value.chart_type);

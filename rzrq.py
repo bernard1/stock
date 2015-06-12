@@ -229,7 +229,7 @@ if strDate == None :
 else:
 	strDate = strDate[0].strftime("%Y-%m-%d")
 
-strDate = '2015-05-29'
+strDate = '2015-06-11'
 
 tstampDate = time.mktime(time.strptime(strDate, "%Y-%m-%d"))
 tstampNow = time.mktime(time.strptime( datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d'), "%Y-%m-%d"))
